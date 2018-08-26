@@ -2,46 +2,9 @@ unit AG.PascalTokeniser;
 
 interface
 
-implementation
-
-(*
-#
-# PyPascalTokenizer
-# Author: Artem Gavrilov (@Artem3213212)
-# License: MPL 2.0
-#
-
-import queue, threading
-
-SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
-SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
-SPACES = ['\f','\n','\r','\t','\v',' ']
-NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
-CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
-CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
-
-def is_comment(s):
-    if type(s) is list:
-        return True
-    else:
-        return s.startswith('{') or s.startswith('(*') or s.startswith('//')
-
-def is_name(s):
-    if len(s)<=0:
-        return False
-    if s=='&':
-        return False
-    if not (s[0] in CHARS_ID0):
-        return False
-    for i in s[1:]:
-        if not (i in CHARS_ID):
-            return False
-    return True
-
-def is_string(s):
-    return s.startswith("'")
-
-class PasTokenizer():
+type
+  TPasTokenizer=class
+  (*class PasTokenizer():
     def __init__(self, s):
         self.s, self.y, self.x, self.ended = s, 0, 0, False
         self._skip_spaces()
@@ -169,7 +132,43 @@ class PasTokenizer():
         return z
 
     def is_ended(self):
-        return self.ended
+        return self.ended*)
+  end;
+
+implementation
+
+(*
+import queue, threading
+
+SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
+SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
+SPACES = ['\f','\n','\r','\t','\v',' ']
+NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
+CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+
+def is_comment(s):
+    if type(s) is list:
+        return True
+    else:
+        return s.startswith('{') or s.startswith('(*') or s.startswith('//')
+
+def is_name(s):
+    if len(s)<=0:
+        return False
+    if s=='&':
+        return False
+    if not (s[0] in CHARS_ID0):
+        return False
+    for i in s[1:]:
+        if not (i in CHARS_ID):
+            return False
+    return True
+
+def is_string(s):
+    return s.startswith("'")
+
+
 
 class PasTokenizerStack():
     def __init__(self, s, comments=True):
