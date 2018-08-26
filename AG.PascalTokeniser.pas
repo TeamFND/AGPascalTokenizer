@@ -2,241 +2,186 @@ unit AG.PascalTokeniser;
 
 interface
 
+uses
+  System.Generics.Collections,
+  System.Classes;
+
+function is_comment(s:string);
+function is_name(s:string);
+function is_string(s:string);
+
+const
+  SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*'];
+  SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*='];
+  SPACES = ['\f','\n','\r','\t','\v',' '];
+  NO_NAME_SYMS = SYMS1 + SPACES + ['{','}'];
+  CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
+  CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+
 type
-  TPasTokenizer=class
-  (*class PasTokenizer():
-    def __init__(self, s):
-        self.s, self.y, self.x, self.ended = s, 0, 0, False
-        self._skip_spaces()
-
-    def _do_readable(self):
-        if not self._is_readable():
-            if self.y+1 == len(self.s):
-                self.ended = True
-            else:
-                self.y+=1
-                self.x=0
-                while not self.s[self.y]:
-                    if self.y+1 == len(self.s):
-                        self.ended = True
-                        break
-                    self.y+=1
-            return True
-        else:
-            return False
-
-    def _is_readable(self):
-        return len(self.s[self.y])>self.x
-
-    def _next_readable(self):
-        self.x+=1
-        return self._do_readable()
-
-    def _skip_spaces(self):
-        self._do_readable()
-        if not self.ended:
-            while self.s[self.y][self.x] in SPACES:
-                self._next_readable()
-
-    def _get_pos(self):
-        return self.y, self.x
-
-    def _set_pos(self, i0, i1):
-        self.y, self.x, self.ended = i0, i1, False
-        self._do_readable()
-
-    def get_next(self):
-        begin_pos = self._get_pos()
-        ml, ss, f = '', '', True
-        str_changed = False
-        while f and not self.ended:
-            line = self.s[self.y]
-            now_sym = line[self.x]
-            l = len(line)
-            if self.x+1 != l:
-                next_sym = line[self.x+1]
-            else:
-                next_sym = ''
-            if ml == '':
-                if now_sym == '/':
-                    if next_sym == '/':
-                        ss = line[self.x:]
-                        self.x = l
-                        break
-                elif now_sym == '{':
-                    ml = '}'
-                    ss=[now_sym]
-                    last_i0 = self.y
-                elif now_sym == '(':
-                    if next_sym == '*':
-                        ml = ')'
-                        self.x+=1
-                        last_i0 = self.y
-                        ss = [now_sym+next_sym]
-                    else:
-                        ss = '('
-                        self.x+=1
-                        break
-                else:
-                    if now_sym in SYMS1:
-                        ss = now_sym
-                        self.x+=1
-                        if now_sym + next_sym in SYMS2:
-                            self.x+=1
-                            ss = ss + next_sym
-                        break
-                    elif now_sym=="'":
-                        ss="'"
-                        self.x+=1
-                        if next_sym!='':
-                            ss = ss + next_sym
-                            while line[self.x]!="'":
-                                self.x+=1
-                                if not self._is_readable():
-                                    self.x-=1
-                                    break
-                                ss = ss + line[self.x]
-                            self.x+=1
-                        break
-                    else:
-                        while not(line[self.x] in NO_NAME_SYMS):
-                            ss=ss+line[self.x]
-                            self.x+=1
-                            if not self._is_readable():
-                                break
-                        break
-            else:
-                while last_i0!=self.y:
-                    ss.append('')
-                    last_i0+=1
-                ss[-1] = ss[-1] + now_sym
-                if now_sym==ml:
-                    if ml=='}':
-                        self.x+=1
-                        break
-                    elif self.x!=0:
-                        if line[self.x-1]=='*':
-                            self.x+=1
-                            break
-            self._next_readable()
-        if len(ss)==1:
-            ss=ss[0]
-        ss=(ss,begin_pos,self._get_pos(),self.ended)
-        self._skip_spaces()
-        return ss
-
-    def read_next(self):
-        i0, i1 = self._get_pos()
-        z = self.get_next()
-        self._set_pos(i0, i1)
-        return z
-
-    def is_ended(self):
-        return self.ended*)
+  PasTokenizer=class
+    private
+      s:TStrings;
+      y:integer;
+      x:integer;
+      ended:boolean;
+      procedure _do_readable();
+      procedure _is_readable();
+      procedure _next_readable();
+      procedure _skip_spaces();
+      procedure _get_pos();
+      procedure _set_pos(i0:integer; i1:integer);
+    public
+      procedure get_next();
+      procedure read_next();
+      procedure is_ended();
+  end;
+  PasTokenizerStack=class
+    private
+      stack:TStack<integer>;
+      // _pop
+      procedure _get_with_comments();
+      procedure _get_without_comments();
+    public
+      procedure push(s:string);
+      procedure pop();
+      procedure read_last();
+      procedure is_ended();
   end;
 
 implementation
 
-(*
-import queue, threading
+function is_comment(s:string);
+begin
+  // TODO
+end;
 
-SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
-SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
-SPACES = ['\f','\n','\r','\t','\v',' ']
-NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
-CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
-CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+function is_name(s:string);
+var
+  i:integer;
+begin
+  if length(s) <= 0 then Exit(False);
+  if s = '&' then Exit(False);
+  if not (s[0] in CHARS_ID0) then Exit(False);
+  for i := 1 to length(s) do
+  begin
+    if not (s[i] in CHARS_ID) then
+      Exit(False);
+  end;
+end;
 
-def is_comment(s):
-    if type(s) is list:
-        return True
-    else:
-        return s.startswith('{') or s.startswith('(*') or s.startswith('//')
+function is_string(s);
+begin
+  // TODO
+end;
 
-def is_name(s):
-    if len(s)<=0:
-        return False
-    if s=='&':
-        return False
-    if not (s[0] in CHARS_ID0):
-        return False
-    for i in s[1:]:
-        if not (i in CHARS_ID):
-            return False
-    return True
+class function PasTokenizer._do_readable();
+begin
+  if not _is_readable() then
+  begin
+    if (y+1 = Length(s)) then
+    begin
+     ended = True;
+    end
+    else begin
+      inc(y);
+      x = 0;
+      while not s[y] = '' do
+      begin
+        if y+1 = length(s) then
+        begin
+          ended = True;
+          break;
+        end;
+        inc(y);
+      end;
+    end;
+    Exit(True);
+  end else Exit(False);
+end;
 
-def is_string(s):
-    return s.startswith("'")
+class function PasTokenizer._is_readable();
+begin
+  Exit(length(s[y]) > x);
+end;
 
+class function PasTokenizer._next_readable();
+begin
+  inc(x);
+  Exit(_do_readable());
+end;
 
+class function PasTokenizer._skip_spaces();
+begin
+  _do_readable();
+  if not ended then
+  begin
+    while s[y][x] in SPACES do
+    _next_readable();
+  end;
+end;
 
-class PasTokenizerStack():
-    def __init__(self, s, comments=True):
-        self.main = PasTokenizer(s)
-        self.stack = []
-        if comments:
-            self._pop = self._get_with_comments
-        else:
-            self._pop = self._get_without_comments
+class function PasTokenizer._get_pos();
+begin
+  Exit(y, x);
+end;
 
-    def _get_with_comments(self):
-        return self.main.get_next()
+class function PasTokenizer._set_pos(i0:integer; i1:integer);
+begin
+  y = i0;
+  x = i1;
+  ended = False;
+  _do_readable();
+end;
 
-    def _get_without_comments(self):
-        while True:
-            s = self.main.get_next()
-            if not is_comment(s[0]):
-                return s
-            if s[3]:
-                return ('',(0,0),(0,0),True)
-
-    def push(self, s):
-        self.stack.append(s)
-
-    def pop(self):
-        if self.stack:
-            return self.stack.pop()
-        else:
-            return self._pop()
-
-    def read_last(self):
-        if not self.stack:
-            self.stack.append(self._pop())
-        return self.stack[-1]
-
-    def is_ended(self):
-        return self.stack and self.main.is_ended()
-
-class PasTokenizerParallelStack(PasTokenizerStack):
-    def __init__(self, s, comments = True, qlong = 1000):
-        super(PasTokenizerParallelStack,self).__init__(s, comments)
-        self.queue = queue.Queue(qlong)
-        th = threading.Thread(target = self._work, args = (self,))
-        th.start()
-
-    def _get_with_comments(self):
-        s = self.queue.get()
-        return s
-
-    def _get_without_comments(self):
-        while True:
-            s = self.queue.get()
-            if not is_comment(s[0]):
-                return s
-            if s[3]:
-                return ('',(0,0),(0,0),True)
-
-    def _work(self,s):
-        while not self.main.is_ended():
-            self.queue.put(self.main.get_next())
-        self.queue.put(('',(0,0),(0,0),True))
-
-    def is_ended(self):
-        return self.stack and self.main.is_ended()and self.queue.empty()
-
-    def stop(self):
-        self.main.ended = True
-        self.queue.task_done()
-*)
-
+class function PasTokenizer.get_next();
+var
+  begin_pos:integer;
+  l:integer;
+  last_i0:integer;
+  m1:string = '';
+  ss:string = '';
+  line:string;
+  now_sym:char;
+  next_sym:char;
+  f:boolean = True;
+  str_changed:boolean = True;
+begin
+  begin_pos = _get_pos();
+  while f and not ended do
+  begin
+    line = s[y];
+    now_sym = line[x];
+    l = length(line);
+    if x+1 <> 1 then
+    begin
+      next_sym = line[x+1];
+    end else begin
+      next_sym = '';
+    end;
+    if m1 = '' then
+    begin
+      if now_sym = '/' then
+      begin
+        if next_sym = '/' then
+        begin
+          ss = line[x];
+          x = 1;
+          break;
+        end;
+      end
+      else if now_sym = '{' then
+      begin
+        m1 = '}';
+        ss = [now_sym];
+        last_i0 = y;
+      end
+      else if now_sym = '(' then
+      begin
+        // TODO
+      end;
+      // TODO
+    end;
+  end;
+end;
 end.
