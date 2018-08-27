@@ -178,10 +178,76 @@ begin
       end
       else if now_sym = '(' then
       begin
-        // TODO
+        if next_sym = '*' then
+        begin
+          ml = ')';
+          inc(x);
+          last_i0 = y;
+          ss = [now_sym+next_sym];
+        end 
+        else
+        begin
+          ss = '(';
+          inc(x);
+          break;
+        end;
+      end
+      else
+      begin
+        if now_sym in SYMS1 then
+        begin
+          ss = now_sym;
+          inc(x);
+          if now_sym + next_sym in SYMS2 then
+          begin
+            inc(x);
+            ss = ss + next_sym;
+          end;
+          break;
+        end
+        else if now_sym = '' {TODO "'"} then
+        begin
+          ss = '' {TODO "'"};
+          inc(x);
+          if next_sym <> '' then
+          begin
+            ss = ss + next_sym;
+            while line[x] <> '' {TODO "'"} do
+            begin
+              inc(x);
+              if not _is_readable() then
+              begin
+                dec(x);
+                break;
+              end;
+              ss = ss + line[x];
+            end;
+            inc(x);
+          end;
+          break;
+        end
+        else
+        begin
+          while not (line[x] in NO_NAME_SYMS) then
+          begin
+            ss = ss + line[x]
+            inc(x);
+            if not _is_readable() then break;
+          end;
+          break;
+        end;
       end;
-      // TODO
+    end
+    else
+    begin
+      while last_i0 <> y do
+      begin
+        {TODO ss.append('')}
+        inc(last_i0);
+      end;
+      //TODO
     end;
+    //TODO
   end;
 end;
 end.
