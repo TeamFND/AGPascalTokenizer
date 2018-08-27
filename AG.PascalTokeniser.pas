@@ -11,9 +11,9 @@ function is_name(s:string);
 function is_string(s:string);
 
 const
-  SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*'];
+  SYMS1 = ['(',')','[',']','/','|','\','@','#','=','>','<',':',';',',','.','$','+','-','*'];
   SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*='];
-  SPACES = ['\f','\n','\r','\t','\v',' '];
+  SPACES = [#12,#10,#13,#9,#11,' '];
   NO_NAME_SYMS = SYMS1 + SPACES + ['{','}'];
   CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
   CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
