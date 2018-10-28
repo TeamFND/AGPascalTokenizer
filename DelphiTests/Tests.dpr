@@ -12,7 +12,7 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   MainTest in 'MainTest.pas',
-  AG.PascalTokeniser in '..\AG.PascalTokeniser.pas';
+  AG.PascalTokenizer in '..\AG.PascalTokenizer.pas';
 
 var
   runner : ITestRunner;

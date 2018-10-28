@@ -1,4 +1,4 @@
-unit AG.PascalTokeniser;
+unit AG.PascalTokenizer;
 
 interface
 
@@ -116,12 +116,12 @@ begin
       x := 1+Fix;
       while s[y]='' do
       begin
-        if y + 1 = s.Count then
-        begin
-          ended := True;
-          break;
-        end;
-        inc(y);
+	if y + 1 = s.Count then
+	begin
+	  ended := True;
+	  break;
+	end;
+	inc(y);
       end;
     end;
     Exit(True);
@@ -191,106 +191,106 @@ begin
     begin
       if now_sym = '/' then
       begin
-        if next_sym = '/' then
-        begin
-          for i:=x to l+Fix do
-            ss:=ss+line[i];
-          x := l+Fix;
-          break;
-        end;
+	if next_sym = '/' then
+	begin
+	  for i:=x to l+Fix do
+	    ss:=ss+line[i];
+	  x := l+Fix;
+	  break;
+	end;
       end
       else if now_sym = '{' then
       begin
-        ml := '}';
-        ss := now_sym;
-        last_i0 := y;
+	ml := '}';
+	ss := now_sym;
+	last_i0 := y;
       end
       else if now_sym = '(' then
       begin
-        if next_sym = '*' then
-        begin
-          ml := ')';
-          inc(x);
-          last_i0 := y;
-          ss := now_sym + next_sym;
-        end
-        else
-        begin
-          ss := '(';
-          inc(x);
-          break;
-        end;
+	if next_sym = '*' then
+	begin
+	  ml := ')';
+	  inc(x);
+	  last_i0 := y;
+	  ss := now_sym + next_sym;
+	end
+	else
+	begin
+	  ss := '(';
+	  inc(x);
+	  break;
+	end;
       end
       else
       begin
-        if SYMS1.Contains(now_sym) then
-        begin
-          ss := now_sym;
-          inc(x);
-          if SYMS2.Contains(now_sym + next_sym) then
-          begin
-            inc(x);
-            ss := ss + next_sym;
-          end;
-          break;
-        end
-        else if now_sym = #39 then
-        begin
-          ss := #39;
-          inc(x);
-          if next_sym <> '' then
-          begin
-            ss := ss + next_sym;
-            while line[x] <> #39 do
-            begin
-              inc(x);
-              if not _is_readable() then
-              begin
-                dec(x);
-                break;
-              end;
-              ss := ss + line[x];
-            end;
-            inc(x);
-          end;
-          break;
-        end
-        else
-        begin
-          while not NO_NAME_SYMS.Contains(line[x]) do
-          begin
-            ss := ss + line[x];
-            inc(x);
-            if not _is_readable() then
-              break;
-          end;
-          break;
-        end;
+	if SYMS1.Contains(now_sym) then
+	begin
+	  ss := now_sym;
+	  inc(x);
+	  if SYMS2.Contains(now_sym + next_sym) then
+	  begin
+	    inc(x);
+	    ss := ss + next_sym;
+	  end;
+	  break;
+	end
+	else if now_sym = #39 then
+	begin
+	  ss := #39;
+	  inc(x);
+	  if next_sym <> '' then
+	  begin
+	    ss := ss + next_sym;
+	    while line[x] <> #39 do
+	    begin
+	      inc(x);
+	      if not _is_readable() then
+	      begin
+		dec(x);
+		break;
+	      end;
+	      ss := ss + line[x];
+	    end;
+	    inc(x);
+	  end;
+	  break;
+	end
+	else
+	begin
+	  while not NO_NAME_SYMS.Contains(line[x]) do
+	  begin
+	    ss := ss + line[x];
+	    inc(x);
+	    if not _is_readable() then
+	      break;
+	  end;
+	  break;
+	end;
       end;
     end
     else
     begin
       while last_i0 <> y do
       begin
-        ss := ss + #10;
-        inc(last_i0);
+	ss := ss + #10;
+	inc(last_i0);
       end;
       if ss[length(ss) + fix] = #10 then
       begin
-        ss[length(ss) + fix] := now_sym;
-        ss := ss + #10;
+	ss[length(ss) + fix] := now_sym;
+	ss := ss + #10;
       end;
       if now_sym = ml then
-        if ml = '}' then
-        begin
-          inc(x);
-          break;
-        end
-        else if (x <> 0) and (line[x - 1] = '*') then
-        begin
-          inc(x);
-          break;
-        end;
+	if ml = '}' then
+	begin
+	  inc(x);
+	  break;
+	end
+	else if (x <> 0) and (line[x - 1] = '*') then
+	begin
+	  inc(x);
+	  break;
+	end;
     end;
     _next_readable();
   end;

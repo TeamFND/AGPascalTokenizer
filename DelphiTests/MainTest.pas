@@ -5,7 +5,7 @@ uses
   DUnitX.TestFramework,
   System.Classes,
   WinAPI.Windows,
-  AG.PascalTokeniser;
+  AG.PascalTokenizer;
 
 type
   [TestFixture]
