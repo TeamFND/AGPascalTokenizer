@@ -3,7 +3,7 @@ unit AG.PascalTokenizer;
 interface
 
 uses
-  {$IFDEF FPC}fgl,{$ELSE}System.Generics.Collections,System.{$ENDIF}SysUtils,{$IFNDEF FPC}System.{$ENDIF}Classes;
+  {$IFDEF FPC}fgl,SysUtils,Classes{$ELSE}System.Generics.Collections,System.SysUtils,System.Classes{$ENDIF};
 
 {$IFDEF FPC}
   {$mode Delphi}
@@ -85,7 +85,7 @@ var
 
 function is_comment(s: string): boolean;
 begin
-  // TODO
+  Result:=(s.startswith('{') or s.startswith('(*') or s.startswith('//'));
 end;
 
 function is_name(s: string): boolean;
@@ -107,7 +107,7 @@ end;
 
 function is_string(s: string): boolean;
 begin
-  // TODO
+  Result:=s.StartsWith(#39);
 end;
 
 function TPasTokenizer._do_readable(): boolean;
