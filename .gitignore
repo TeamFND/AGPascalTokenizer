@@ -82,3 +82,4 @@ FPCTests/*.ico
 Tests/Win32
 !FasmDll/*
 !FasmDll/DEMO/*
+*.xml

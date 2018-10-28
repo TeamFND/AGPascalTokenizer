@@ -2,7 +2,10 @@ unit MainTest;
 
 interface
 uses
-  DUnitX.TestFramework;
+  DUnitX.TestFramework,
+  System.Classes,
+  WinAPI.Windows,
+  AG.PascalTokeniser;
 
 type
   [TestFixture]
@@ -18,7 +21,21 @@ type
 implementation
 
 procedure TMyTestObject.Test1;
+var
+  input:TStrings;
+  tokenizer:TPasTokenizer;
+  token:TToken;
 begin
+  input:= TStringList.Create();
+  input.LoadFromFile('..\..\MainTest.pas');
+  tokenizer:=TPasTokenizer.Create(input);
+  token.ended:=False;
+  while not token.ended do
+  begin
+    token:=tokenizer.get_next;
+    TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
+  end;
+  //sleep(10000);
 end;
 
 initialization
