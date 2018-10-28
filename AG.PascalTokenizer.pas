@@ -3,10 +3,15 @@ unit AG.PascalTokenizer;
 interface
 
 uses
-  System.Generics.Collections, System.SysUtils,
-  System.Classes;
+  {$IFDEF FPC}fgl,{$ELSE}System.Generics.Collections,System.{$ENDIF}SysUtils,{$IFNDEF FPC}System.{$ENDIF}Classes;
+
+{$IFDEF FPC}
+  {$mode Delphi}
+{$ENDIF}
 
 type
+  {$IFDEF FPC}TFpcList=specialize TFPGList<String>;{$ENDIF}
+
   TTokenizerPos = record
     x, y: integer;
   end;
@@ -15,8 +20,7 @@ type
     Text: string;
     &begin, &end: TTokenizerPos;
     ended: boolean;
-    constructor Create(Text: string; &begin, &end: TTokenizerPos;
-      ended: boolean);
+    {$IFNDEF FPC}constructor Create(Text: string; &begin, &end: TTokenizerPos;ended:boolean);{$ENDIF}
   end;
 
   TPasTokenizer = class
@@ -57,6 +61,7 @@ function is_string(s: string): boolean;
 
 implementation
 
+{$IFNDEF FPC}
 constructor TToken.Create(Text: string; &begin, &end: TTokenizerPos;
   ended: boolean);
 begin
@@ -65,9 +70,10 @@ begin
   Self.&end := &end;
   Self.ended := ended;
 end;
+{$ENDIF}
 
 const
-  SYMS1 = '()[]/|\@#=><:;,.$+-*';
+  SYMS1 = '()[]/|\@#=><:;,.$+-*^';
   SPACES = #12#10#13#9#11' ';
   NO_NAME_SYMS = SYMS1 + SPACES + '{}';
   CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
@@ -75,7 +81,7 @@ const
   fix = {$IFDEF NEXTGEN}-1{$ELSE}0{$ENDIF};
 
 var
-  SYMS2: TList<String>; // array[0..8]of string=();
+  SYMS2:{$IFDEF FPC}TFpcList{$ELSE}TList<string>{$ENDIF}; // array[0..8]of string=();
 
 function is_comment(s: string): boolean;
 begin
@@ -170,7 +176,7 @@ var
   l,i,last_i0:integer;
   ml,ss,line:string;
   now_sym,next_sym:char;
-  f,str_changed:boolean;
+  f,{$IFDEF FPC}ff,{$ENDIF}str_changed:boolean;
   begin_pos:TTokenizerPos;
 begin
   ml := '';
@@ -227,7 +233,18 @@ begin
 	begin
 	  ss := now_sym;
 	  inc(x);
-	  if SYMS2.Contains(now_sym + next_sym) then
+          {$IFDEF FPC}
+          ff:=false;
+          for i:=0 to SYMS2.Count-1 do
+            if SYMS2[i]=now_sym+next_sym then
+            begin
+              ff:=true;
+              break;
+            end;
+          if ff then
+          {$ELSE}
+	  if SYMS2.Contains(now_sym+next_sym) then
+          {$ENDIF}
 	  begin
 	    inc(x);
 	    ss := ss + next_sym;
@@ -275,11 +292,7 @@ begin
 	ss := ss + #10;
 	inc(last_i0);
       end;
-      if ss[length(ss) + fix] = #10 then
-      begin
-	ss[length(ss) + fix] := now_sym;
-	ss := ss + #10;
-      end;
+      ss:=ss+now_sym;
       if now_sym = ml then
 	if ml = '}' then
 	begin
@@ -294,7 +307,14 @@ begin
     end;
     _next_readable();
   end;
+  {$IFDEF FPC}    
+  Result.Text:=ss;
+  Result.&begin:=begin_pos;
+  Result.&end:=_get_pos;
+  Result.ended:=ended;
+  {$ELSE}
   Result := TToken.Create(ss, begin_pos, _get_pos, ended);
+  {$ENDIF}
   _skip_spaces;
 end;
 
@@ -308,7 +328,7 @@ begin
 end;
 
 initialization
-SYMS2 := TList<string>.Create();
+SYMS2 := {$IFDEF FPC}TFpcList{$ELSE}TList<string>{$ENDIF}.Create();
 SYMS2.Add('>=');
 SYMS2.Add('<=');
 SYMS2.Add('<>');
@@ -318,5 +338,10 @@ SYMS2.Add('-=');
 SYMS2.Add('+=');
 SYMS2.Add('/=');
 SYMS2.Add('*=');
-
+SYMS2.Add('**');
+SYMS2.Add('><');
+SYMS2.Add('(.');
+SYMS2.Add('.)');
+SYMS2.Add('<<');
+SYMS2.Add('>>');
 end.
