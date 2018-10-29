@@ -3,15 +3,17 @@ unit AG.PascalTokenizer;
 interface
 
 uses
-  {$IFDEF FPC}fgl,SysUtils,Classes{$ELSE}System.Generics.Collections,System.SysUtils,System.Classes{$ENDIF};
+  {$IFDEF FPC}
+    SysUtils,Classes
+  {$ELSE}
+    System.Generics.Collections,System.SysUtils,System.Classes
+  {$ENDIF};
 
 {$IFDEF FPC}
   {$mode Delphi}
 {$ENDIF}
 
 type
-  {$IFDEF FPC}TFpcList=specialize TFPGList<String>;{$ENDIF}
-
   TAGTokenizerPos = record
     x, y: integer;
   end;
@@ -81,7 +83,7 @@ const
   fix = {$IFDEF NEXTGEN}-1{$ELSE}0{$ENDIF};
 
 var
-  SYMS2:{$IFDEF FPC}TFpcList{$ELSE}TList<string>{$ENDIF}; // array[0..8]of string=();
+  SYMS2:{$IFDEF FPC}TStringList{$ELSE}TList<string>{$ENDIF}; // array[0..8]of string=();
 
 function IsComment(s:string):boolean;
 begin
@@ -233,18 +235,11 @@ begin
 	begin
 	  ss := now_sym;
 	  inc(x);
-          {$IFDEF FPC}
-          ff:=false;
-          for i:=0 to SYMS2.Count-1 do
-            if SYMS2[i]=now_sym+next_sym then
-            begin
-              ff:=true;
-              break;
-            end;
-          if ff then
-          {$ELSE}
-	  if SYMS2.Contains(now_sym+next_sym) then
-          {$ENDIF}
+          if SYMS2.{$IFDEF FPC}
+              IndexOf(now_sym+next_sym)<>-1
+            {$ELSE}
+	      Contains(now_sym+next_sym)
+            {$ENDIF}then
 	  begin
 	    inc(x);
 	    ss := ss + next_sym;
@@ -328,7 +323,7 @@ begin
 end;
 
 initialization
-SYMS2 := {$IFDEF FPC}TFpcList{$ELSE}TList<string>{$ENDIF}.Create();
+SYMS2 := {$IFDEF FPC}TStringList{$ELSE}TList<string>{$ENDIF}.Create();
 SYMS2.Add('>=');
 SYMS2.Add('<=');
 SYMS2.Add('<>');
