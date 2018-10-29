@@ -19,16 +19,16 @@ implementation
 procedure TTestCase1.TestHookUp;
 var
   input:TStrings;
-  tokenizer:TPasTokenizer;
-  token:TToken;
+  tokenizer:TAGPasTokenizer;
+  token:TAGToken;
 begin
   input:= TStringList.Create();
   input.LoadFromFile('testcase1.pas');
-  tokenizer:=TPasTokenizer.Create(input);
+  tokenizer:=TAGPasTokenizer.Create(input);
   token.ended:=False;
   while not token.ended do
   begin
-    token:=tokenizer.get_next;
+    token:=tokenizer.GetNext;
     TestRunner.MemoLog.Append(token.Text);
   end;
 end;

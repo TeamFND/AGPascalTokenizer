@@ -28,16 +28,16 @@ implementation
 procedure TMyTestObject.Test1;
 var
   input:TStrings;
-  tokenizer:TPasTokenizer;
-  token:TToken;
+  tokenizer:TAGPasTokenizer;
+  token:TAGToken;
 begin
   input:= TStringList.Create();
   input.LoadFromFile('..\..\MainTest.pas');
-  tokenizer:=TPasTokenizer.Create(input);
+  tokenizer:=TAGPasTokenizer.Create(input);
   token.ended:=False;
   while not token.ended do
   begin
-    token:=tokenizer.get_next;
+    token:=tokenizer.GetNext;
     TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
   end;
   //sleep(10000);
@@ -48,10 +48,10 @@ var
   s:string;
 begin
   s:=#39'kek'#39;
-  if not is_string(s) then
+  if not IsString(s) then
     raise Exception.Create('Is string error 1');
   s:='s:=12334;';
-  if is_string(s) then
+  if IsString(s) then
     raise Exception.Create('Is string error 2');
 end;
 
@@ -60,13 +60,13 @@ var
   s:string;
 begin
   s:='{ asdasdasd }';
-  if not is_comment(s) then
+  if not IsComment(s) then
     raise Exception.Create('Is comment error 1');
   s:='(* s:=12334;*)';
-  if not is_comment(s) then
+  if not IsComment(s) then
     raise Exception.Create('Is comment error 2');
   s:='// s:=12334;*)';
-  if not is_comment(s) then
+  if not IsComment(s) then
     raise Exception.Create('Is comment error 3');
 end;
 

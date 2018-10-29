@@ -12,34 +12,34 @@ uses
 type
   {$IFDEF FPC}TFpcList=specialize TFPGList<String>;{$ENDIF}
 
-  TTokenizerPos = record
+  TAGTokenizerPos = record
     x, y: integer;
   end;
 
-  TToken = record
+  TAGToken = record
     Text: string;
-    &begin, &end: TTokenizerPos;
+    &begin, &end: TAGTokenizerPos;
     ended: boolean;
-    {$IFNDEF FPC}constructor Create(Text: string; &begin, &end: TTokenizerPos;ended:boolean);{$ENDIF}
+    {$IFNDEF FPC}constructor Create(Text: string; &begin, &end: TAGTokenizerPos;ended:boolean);{$ENDIF}
   end;
 
-  TPasTokenizer = class
-  private
+  TAGPasTokenizer = class
+  strict protected
     s: TStrings;
     y: integer;
     x: integer;
-    ended: boolean;
-    function _do_readable(): boolean;
-    function _is_readable(): boolean;
-    function _next_readable(): boolean;
-    procedure _skip_spaces();
-    function _get_pos(): TTokenizerPos;
-    procedure _set_pos(i0: integer; i1: integer);
+    function DoReadable():boolean;
+    function IsReadable():boolean;
+    function NextReadable():boolean;
+    procedure SkipSpaces();
+    function GetPos():TAGTokenizerPos;
+    procedure SetPos(pos:TAGTokenizerPos);
   public
-    function get_next(): TToken;
+    ended: boolean;
+    function GetNext(): TAGToken;
     // procedure read_next();
-    // procedure is_ended();
     constructor Create(input:TStrings);
+    property Pos:TAGTokenizerPos read GetPos write SetPos;
   end;
 
   {PasTokenizerStack = class
@@ -55,14 +55,14 @@ type
     procedure is_ended();
   end;}
 
-function is_comment(s: string): boolean;
-function is_name(s: string): boolean;
-function is_string(s: string): boolean;
+function IsComment(s: string): boolean;
+function IsName(s: string): boolean;
+function IsString(s: string): boolean;
 
 implementation
 
 {$IFNDEF FPC}
-constructor TToken.Create(Text: string; &begin, &end: TTokenizerPos;
+constructor TAGToken.Create(Text: string; &begin, &end: TAGTokenizerPos;
   ended: boolean);
 begin
   Self.Text := Text;
@@ -83,12 +83,12 @@ const
 var
   SYMS2:{$IFDEF FPC}TFpcList{$ELSE}TList<string>{$ENDIF}; // array[0..8]of string=();
 
-function is_comment(s: string): boolean;
+function IsComment(s:string):boolean;
 begin
   Result:=(s.startswith('{') or s.startswith('(*') or s.startswith('//'));
 end;
 
-function is_name(s: string): boolean;
+function IsName(s:string):boolean;
 var
   i: integer;
 begin
@@ -103,16 +103,17 @@ begin
     if not CHARS_ID.Contains(s[i]) then
       Exit(False);
   end;
+  Result:=True;
 end;
 
-function is_string(s: string): boolean;
+function IsString(s: string):boolean;
 begin
   Result:=s.StartsWith(#39);
 end;
 
-function TPasTokenizer._do_readable(): boolean;
+function TAGPasTokenizer.DoReadable(): boolean;
 begin
-  if not _is_readable() then
+  if not IsReadable() then
   begin
     if (y + 1 = s.Count) then
       ended := True
@@ -136,54 +137,53 @@ begin
     Exit(False);
 end;
 
-function TPasTokenizer._is_readable(): boolean;
+function TAGPasTokenizer.IsReadable(): boolean;
 begin
   Exit(length(s[y])+1+Fix > x);
 end;
 
-function TPasTokenizer._next_readable(): boolean;
+function TAGPasTokenizer.NextReadable(): boolean;
 begin
   inc(x);
-  Result := _do_readable();
+  Result := DoReadable();
 end;
 
-procedure TPasTokenizer._skip_spaces();
+procedure TAGPasTokenizer.SkipSpaces();
 begin
-  _do_readable();
+  DoReadable();
   if not ended then
   begin
     while SPACES.Contains(s[y][x]) do
-      _next_readable();
+      NextReadable();
   end;
 end;
 
-function TPasTokenizer._get_pos(): TTokenizerPos;
+function TAGPasTokenizer.GetPos(): TAGTokenizerPos;
 begin
   Result.x := x;
   Result.y := y;
 end;
 
-procedure TPasTokenizer._set_pos(i0: integer; i1: integer);
+procedure TAGPasTokenizer.SetPos(pos:TAGTokenizerPos);
 begin
-  y := i0;
-  x := i1;
-  ended := False;
-  _do_readable();
+  y:=Pos.x;
+  x:=Pos.y;
+  ended:=False;
+  DoReadable();
 end;
 
-function TPasTokenizer.get_next(): TToken;
+function TAGPasTokenizer.GetNext(): TAGToken;
 var
   l,i,last_i0:integer;
   ml,ss,line:string;
   now_sym,next_sym:char;
-  f,{$IFDEF FPC}ff,{$ENDIF}str_changed:boolean;
-  begin_pos:TTokenizerPos;
+  f{$IFDEF FPC},ff{$ENDIF}:boolean;
+  begin_pos:TAGTokenizerPos;
 begin
   ml := '';
   ss := '';
   f := True;
-  str_changed := True;
-  begin_pos := _get_pos();
+  begin_pos := GetPos();
   while f and not ended do
   begin
     line := s[y];
@@ -261,7 +261,7 @@ begin
 	    while line[x] <> #39 do
 	    begin
 	      inc(x);
-	      if not _is_readable() then
+	      if not IsReadable() then
 	      begin
 		dec(x);
 		break;
@@ -278,7 +278,7 @@ begin
 	  begin
 	    ss := ss + line[x];
 	    inc(x);
-	    if not _is_readable() then
+	    if not IsReadable() then
 	      break;
 	  end;
 	  break;
@@ -305,26 +305,26 @@ begin
 	  break;
 	end;
     end;
-    _next_readable();
+    NextReadable();
   end;
-  {$IFDEF FPC}    
+  {$IFDEF FPC}
   Result.Text:=ss;
   Result.&begin:=begin_pos;
-  Result.&end:=_get_pos;
+  Result.&end:=GetPos;
   Result.ended:=ended;
   {$ELSE}
-  Result := TToken.Create(ss, begin_pos, _get_pos, ended);
+  Result := TAGToken.Create(ss, begin_pos, GetPos, ended);
   {$ENDIF}
-  _skip_spaces;
+  SkipSpaces;
 end;
 
-constructor TPasTokenizer.Create(input:TStrings);
+constructor TAGPasTokenizer.Create(input:TStrings);
 begin
   s:=input;
   y:=0;
   x:=1+fix;
   ended:=False;
-  _skip_spaces;
+  SkipSpaces;
 end;
 
 initialization
