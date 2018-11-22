@@ -44,18 +44,25 @@ type
     property Pos:TAGTokenizerPos read GetPos write SetPos;
   end;
 
-  {PasTokenizerStack = class
-  private
-    stack: TStack<integer>;
-    // _pop
-    procedure _get_with_comments();
-    procedure _get_without_comments();
+  {$IFNDEF FPC}
+  TAGPasTokenizerStack=class
+  strict protected
+    type
+      GetCall=reference to function(Tokenizer:TAGPasTokenizer):TAGToken;
+    var
+      Stack:TStack<TAGToken>;
+      Tokenizer:TAGPasTokenizer;
+      Get:GetCall;
+    function GetLast():TAGToken;
+    function IsEnded():Boolean;
   public
-    procedure push(s: string);
-    procedure pop();
-    procedure read_last();
-    procedure is_ended();
-  end;}
+    constructor Create(input:TStrings;GetComments:boolean=True);
+    procedure Push(t:TAGToken);
+    function Pop():TAGToken;
+    property Last:TAGToken read GetLast write Push;
+    property Ended:Boolean read IsEnded;
+  end;
+  {$ENDIF}
 
 function IsComment(s: string): boolean;
 function IsName(s: string): boolean;
@@ -182,123 +189,124 @@ var
   f{$IFDEF FPC},ff{$ENDIF}:boolean;
   begin_pos:TAGTokenizerPos;
 begin
-  ml := '';
-  ss := '';
-  f := True;
-  begin_pos := GetPos();
+  ml:='';
+  ss:='';
+  f:=True;
+  begin_pos:=GetPos();
   while f and not ended do
   begin
-    line := s[y];
-    now_sym := line[x];
-    l := length(line);
+    line:=s[y];
+    now_sym:=line[x];
+    l:=length(line);
     if x<>l+Fix then
-      next_sym := line[x + 1]
+      next_sym:=line[x+1]
     else
-      next_sym := #0;
+      next_sym:=#0;
     if ml='' then
     begin
-      if now_sym = '/' then
+      if now_sym='/' then
       begin
-	if next_sym = '/' then
-	begin
-	  for i:=x to l+Fix do
-	    ss:=ss+line[i];
-	  x := l+Fix;
-	  break;
-	end;
+        if next_sym='/' then
+        begin
+          for i:=x to l+Fix do
+            ss:=ss+line[i];
+          x:=l+Fix;
+          break;
+        end;
       end
-      else if now_sym = '{' then
+      else if now_sym='{' then
       begin
-	ml := '}';
-	ss := now_sym;
-	last_i0 := y;
+        ml:='}';
+        ss:=now_sym;
+        last_i0:=y;
       end
-      else if now_sym = '(' then
+      else if now_sym='(' then
       begin
-	if next_sym = '*' then
-	begin
-	  ml := ')';
-	  inc(x);
-	  last_i0 := y;
-	  ss := now_sym + next_sym;
-	end
-	else
-	begin
-	  ss := '(';
-	  inc(x);
-	  break;
-	end;
+        if next_sym='*' then
+        begin
+          ml:=')';
+          inc(x);
+          last_i0:=y;
+          ss:=now_sym+next_sym;
+        end
+        else
+        begin
+          ss:='(';
+          inc(x);
+          break;
+        end;
       end
       else
       begin
-	if SYMS1.Contains(now_sym) then
-	begin
-	  ss := now_sym;
-	  inc(x);
-          if SYMS2.{$IFDEF FPC}
+        if SYMS1.Contains(now_sym)then
+        begin
+          ss:=now_sym;
+          inc(x);
+          if SYMS2.
+            {$IFDEF FPC}
               IndexOf(now_sym+next_sym)<>-1
             {$ELSE}
-	      Contains(now_sym+next_sym)
+              Contains(now_sym+next_sym)
             {$ENDIF}then
-	  begin
-	    inc(x);
-	    ss := ss + next_sym;
-	  end;
-	  break;
-	end
-	else if now_sym = #39 then
-	begin
-	  ss := #39;
-	  inc(x);
-	  if next_sym <> '' then
-	  begin
-	    ss := ss + next_sym;
-	    while line[x] <> #39 do
-	    begin
-	      inc(x);
-	      if not IsReadable() then
-	      begin
-		dec(x);
-		break;
-	      end;
-	      ss := ss + line[x];
-	    end;
-	    inc(x);
-	  end;
-	  break;
-	end
-	else
-	begin
-	  while not NO_NAME_SYMS.Contains(line[x]) do
-	  begin
-	    ss := ss + line[x];
-	    inc(x);
-	    if not IsReadable() then
-	      break;
-	  end;
-	  break;
-	end;
+          begin
+            inc(x);
+            ss:=ss+next_sym;
+          end;
+        break;
+        end
+        else if now_sym=#39 then
+        begin
+          ss:=#39;
+          inc(x);
+          if next_sym<>'' then
+          begin
+            ss:=ss+next_sym;
+            while line[x] <> #39 do
+            begin
+              inc(x);
+              if not IsReadable() then
+              begin
+                dec(x);
+                break;
+              end;
+              ss:=ss+line[x];
+            end;
+            inc(x);
+          end;
+          break;
+        end
+        else
+        begin
+          while not NO_NAME_SYMS.Contains(line[x]) do
+          begin
+            ss:=ss+line[x];
+            inc(x);
+            if not IsReadable() then
+              break;
+          end;
+          break;
+        end;
       end;
     end
     else
     begin
-      while last_i0 <> y do
+      while last_i0<>y do
       begin
-	ss := ss + #10;
-	inc(last_i0);
+        ss:=ss+#10;
+        inc(last_i0);
       end;
       ss:=ss+now_sym;
-      if now_sym = ml then
-	if ml = '}' then
-	begin
-	  inc(x);
-	  break;
-	end
-	else if (x <> 0) and (line[x - 1] = '*') then
-	begin
-	  inc(x);
-	  break;
-	end;
+      if now_sym=ml then
+        if ml='}' then
+        begin
+          inc(x);
+          break;
+        end
+        else if(x<>0)and(line[x-1]='*')then
+        begin
+          inc(x);
+          break;
+        end;
     end;
     NextReadable();
   end;
@@ -308,7 +316,7 @@ begin
   Result.&end:=GetPos;
   Result.ended:=ended;
   {$ELSE}
-  Result := TAGToken.Create(ss, begin_pos, GetPos, ended);
+  Result:=TAGToken.Create(ss,begin_pos,GetPos,ended);
   {$ENDIF}
   SkipSpaces;
 end;
@@ -321,6 +329,61 @@ begin
   ended:=False;
   SkipSpaces;
 end;
+
+{$IFNDEF FPC}
+{TAGPasTokenizerStack}
+
+function TAGPasTokenizerStack.GetLast():TAGToken;
+begin
+if Stack.Count<>0 then
+  Result:=Stack.Peek
+else
+begin
+  Result:=Get;
+  Stack.Push(Result);
+end;
+end;
+
+function TAGPasTokenizerStack.IsEnded():Boolean;
+begin
+
+end;
+
+constructor TAGPasTokenizerStack.Create(input:TStrings;GetComments:boolean=True);
+begin
+Stack:=TStack<TAGToken>.Create();
+Tokenizer:=TAGPasTokenizer.Create(input);
+if GetComments then
+  Get:=function(Tokenizer:TAGPasTokenizer):TAGToken
+    begin
+      Result:=Tokenizer.GetNext;
+    end
+else
+  Get:=function(Tokenizer:TAGPasTokenizer):TAGToken
+    begin
+      while True do
+      begin
+        Result:=Tokenizer.GetNext;
+        if Result.ended or not IsComment(Result.Text) then
+          break;
+      end;
+    end;
+end;
+
+procedure TAGPasTokenizerStack.Push(t:TAGToken);
+begin
+Stack.Push(t);
+end;
+
+function TAGPasTokenizerStack.Pop():TAGToken;
+begin
+if Stack.Count<>0 then
+  Result:=Stack.Pop
+else
+  Result:=Get;
+end;
+
+{$ENDIF}
 
 initialization
 SYMS2 := {$IFDEF FPC}TStringList{$ELSE}TList<string>{$ENDIF}.Create();
