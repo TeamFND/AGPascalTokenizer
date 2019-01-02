@@ -62,6 +62,20 @@ type
     property Last:TAGToken read GetLast write Push;
     property Ended:Boolean read IsEnded;
   end;
+
+  {TAGPasTokenizerParallelStack=class(TAGPasTokenizerStack)
+  strict protected
+    var
+      Stack:TStack<TAGToken>;
+      Tokenizer:TAGPasTokenizer;
+      Get:GetCall;
+    function GetLast():TAGToken;
+    function IsEnded():Boolean;
+  public
+    constructor Create(input:TStrings;GetComments:boolean=True);
+    procedure Push(t:TAGToken);
+    function Pop():TAGToken;
+  end;       }
   {$ENDIF}
 
 function IsComment(s: string): boolean;
