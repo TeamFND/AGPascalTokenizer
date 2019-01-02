@@ -20,6 +20,10 @@ type
     procedure Test2;
     [Test]
     procedure Test3;
+    [Test]
+    procedure Test4;
+    [Test]
+    procedure Test5;
     // Test with TestCase Atribute to supply parameters.
   end;
 
@@ -40,7 +44,6 @@ begin
     token:=tokenizer.GetNext;
     TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
   end;
-  //sleep(10000);
 end;
 
 procedure TMyTestObject.Test2;
@@ -68,6 +71,40 @@ begin
   s:='// s:=12334;*)';
   if not IsComment(s) then
     raise Exception.Create('Is comment error 3');
+end;
+
+procedure TMyTestObject.Test4;
+var
+  input:TStrings;
+  tokenizer:TAGPasTokenizerStack;
+  token:TAGToken;
+begin
+  input:= TStringList.Create();
+  input.LoadFromFile('..\..\MainTest.pas');
+  tokenizer:=TAGPasTokenizerStack.Create(input);
+  token.ended:=False;
+  while not token.ended do
+  begin
+    token:=tokenizer.Pop;
+    TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
+  end;
+end;
+
+procedure TMyTestObject.Test5;
+var
+  input:TStrings;
+  tokenizer:TAGPasTokenizerStack;
+  token:TAGToken;
+begin
+  input:= TStringList.Create();
+  input.LoadFromFile('..\..\MainTest.pas');
+  tokenizer:=TAGPasTokenizerStack.Create(input);
+  token.ended:=False;
+  while not token.ended do
+  begin
+    token:=tokenizer.Pop;
+    TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
+  end;
 end;
 
 initialization

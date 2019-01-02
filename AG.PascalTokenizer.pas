@@ -339,7 +339,7 @@ if Stack.Count<>0 then
   Result:=Stack.Peek
 else
 begin
-  Result:=Get;
+  Result:=Get(Tokenizer);
   Stack.Push(Result);
 end;
 end;
@@ -380,7 +380,7 @@ begin
 if Stack.Count<>0 then
   Result:=Stack.Pop
 else
-  Result:=Get;
+  Result:=Get(Tokenizer);
 end;
 
 {$ENDIF}
