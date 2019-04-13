@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="5">
+      <Unit0>
+        <Filename Value="Demo.dpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="11" Y="13"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="7" Y="23"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\..\..\pro\fpcsrc\packages\fcl-base\src\syncobjs.pp"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="124"/>
+        <CursorPos X="25" Y="137"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\..\pro\fpcsrc\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="964"/>
+        <CursorPos X="57" Y="977"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\FPCTests\fpcunitproject1.lpr"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit4>
+    </Units>
+    <JumpHistory Count="13" HistoryIndex="12">
+      <Position1>
+        <Filename Value="Demo.dpr"/>
+        <Caret Line="13" Column="3"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="27" Column="11" TopLine="5"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="55" Column="16" TopLine="42"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="8" Column="6"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="68" Column="30" TopLine="56"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="88" Column="30" TopLine="78"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="410" Column="45" TopLine="398"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="453" Column="5" TopLine="441"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="6" Column="41"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Demo.dpr"/>
+        <Caret Line="46" Column="26" TopLine="35"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Demo.dpr"/>
+        <Caret Line="30" Column="29" TopLine="8"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\AG.PascalTokenizer.pas"/>
+        <Caret Line="23" Column="7"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Demo.dpr"/>
+        <Caret Line="13" Column="8"/>
+      </Position13>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+  <SkipCheckLCLInterfaces Value="True"/>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="Demo.dpr"/>
+        <Line Value="73"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>

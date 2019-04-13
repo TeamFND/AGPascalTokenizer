@@ -23,6 +23,8 @@ type
     [Test]
     procedure Test4;
     [Test]
+    procedure TestParallel;
+    [Test]
     procedure Test5;
     // Test with TestCase Atribute to supply parameters.
   end;
@@ -99,6 +101,23 @@ begin
   input:= TStringList.Create();
   input.LoadFromFile('..\..\MainTest.pas');
   tokenizer:=TAGPasTokenizerStack.Create(input);
+  token.ended:=False;
+  while not token.ended do
+  begin
+    token:=tokenizer.Pop;
+    TDUnitX.CurrentRunner.Log(TLogLevel.Information, token.Text);
+  end;
+end;
+
+procedure TMyTestObject.TestParallel;
+var
+  input:TStrings;
+  tokenizer:TAGPasTokenizerStack;
+  token:TAGToken;
+  begin
+  input:= TStringList.Create();
+  input.LoadFromFile('..\..\MainTest.pas');
+  tokenizer:=TAGPasTokenizerParallelStack.Create(input);
   token.ended:=False;
   while not token.ended do
   begin
