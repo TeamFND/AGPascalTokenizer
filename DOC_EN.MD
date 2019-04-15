@@ -4,50 +4,63 @@ Tokenizer Library for Delphi/FPC. Based on [PyPascalTokenizer](https://github.co
 
 ## API
 
-### TToken struct
+### TAGToken struct
 
-TToken is a `record` type of:
+TAGToken is a `record` type of:
 
 * Text: `string` with token text.
-* &begin: `TTokenizerPos` with start position of token.
-* &end: `TTokenizerPos` with end position of token.
+* &begin: `TAGTokenizerPos` with start position of token.
+* &end: `TAGTokenizerPos` with end position of token.
 * ended: `boolean` flag, true if it was the last token.
 
 Has Create constructor with all values.
 
-### TTokenizerPos
+### TAGTokenizerPos
 
 `record`, saves position of token if format:
 
 * x: `integer` platform-depend-base (`NEXTGEN`) character index in line.
 * y: `integer` 0-based line index.
 
-### `Class` PasTokenizer
+### `Class` TAGPasTokenizer
 
 Main class of tokenizer.
 
-* s: `TStrings` private, use constructor. List of source code strings.
-* get_next(): function, returns `TToken`. Get next token and change end pos
-* read_next(): function, not implemented, get next token, but don't change end pos.
-* is_ended(): function, not implemented, check if text ended.
+* get_next(): `TAGToken` function, returns. Get next token and change pos
+* pos: `TAGTokenizerPos` property, containing position whear tokenizer was stoped after last get_next(), writeble.
+* is_ended: `boolean` property, check if text ended.
 
-Has constructor Create with `s` param.
+Has constructor Create with `input`: `TStrings` param.
 
-### `Class` PasTokenizerStack
+### `Class` TAGPasTokenizerStack
 
-Not implemented.
+Stack of tokens automaticaly filled from input.
 
-### `Class` PasTokenizerParallelStack
+* Push(t: `TAGToken`) push token to stack.
+* Pop(): `TAGToken` pop token from stack.
+* Last: `TAGToken` property, seek stask head.
+* ended: `boolean` property, check if text ended.
 
-Not implemented.
+Has constructor Create with input: `TStrings` and GetComments: `boolean=True` param.
+
+### `Class` TAGPasTokenizerParallelStack
+
+Stack of tokens automaticaly filled from input(in second tread).
+
+* Push(t: `TAGToken`) push token to stack.
+* Pop(): `TAGToken` pop token from stack.
+* Last: `TAGToken` property, seek stask head.
+* ended: `boolean` property, check if text ended.
+
+Has constructor Create with input: `TStrings`, GetComments: `boolean=True` and stackMax:`integer=1000` param.
 
 ## Utils
 
 Helper functions to analyze token text.
 
-* is_name(s: `string`): `boolean` Check for valid identifier (can be reserved word too).
-* is_comment(s: `string`): `boolean` Check for valid comment.
-* is_string(s: `string`): `boolean` Check for string constant.
+* IsName(s: `string`): `boolean` Check for valid identifier (can be reserved word too).
+* IsComment(s: `string`): `boolean` Check for valid comment.
+* IsString(s: `string`): `boolean` Check for string constant.
 
 ## Author
 

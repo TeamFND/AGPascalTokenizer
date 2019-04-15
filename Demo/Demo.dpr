@@ -11,7 +11,7 @@ program Demo;
 
 uses
   {$IF not defined(FPC)}
-  FastMM4,
+  //FastMM4,
   {$endif}
   SysUtils,
   Classes,
