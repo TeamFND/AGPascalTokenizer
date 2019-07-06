@@ -234,6 +234,8 @@ begin
           x:=l+1+fix;
           break;
         end
+        else
+          ss:=['/'];
       else if now_sym='{' then
       begin
         ml:='}';
