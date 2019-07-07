@@ -107,7 +107,12 @@ var
 
 function IsComment(s:string):boolean;
 begin
-Result:=s.startswith('{')or s.startswith('(*')or s.startswith('//');
+Result:=(s.startswith('{')and not s.startswith('{$')) or s.startswith('(*')or s.startswith('//');
+end;
+
+function IsDirective(s:string):boolean;
+begin
+Result:=s.startswith('{$');
 end;
 
 function IsName(s:string):boolean;
