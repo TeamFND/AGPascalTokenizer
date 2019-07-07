@@ -235,7 +235,7 @@ begin
           break;
         end
         else
-          ss:=['/'];
+          ss:='/'
       else if now_sym='{' then
       begin
         ml:='}';
