@@ -58,8 +58,9 @@ TAGToken это тип `record` из:
 
 Вспомогательные функции для анализа текста.
 
-* IsName(s: `string`): `boolean` Проверка что идентификатор правильный.
-* IsComment(s: `string`): `boolean` Проверка что комментарий правильный.
+* IsName(s: `string`): `boolean` Проверка что это  идентификатор.
+* IsComment(s: `string`): `boolean` Проверка что это комментарий.
+* IsDirective(s: `string`): `boolean` Проверка что это директива компилятора.
 * IsString(s: `string`): `boolean` Проверка что это строковое значение.
 
 ## Авторы

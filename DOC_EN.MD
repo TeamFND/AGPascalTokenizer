@@ -58,9 +58,10 @@ Has constructor Create with input: `TStrings`, GetComments: `boolean=True` and s
 
 Helper functions to analyze token text.
 
-* IsName(s: `string`): `boolean` Check for valid identifier (can be reserved word too).
-* IsComment(s: `string`): `boolean` Check for valid comment.
-* IsString(s: `string`): `boolean` Check for string constant.
+* IsName(s: `string`): `boolean` Check is identifier (can be reserved word too).
+* IsComment(s: `string`): `boolean` Check is comment.
+* IsDirective(s: `string`): `boolean` Check is compiler directive.
+* IsString(s: `string`): `boolean` Check is string constant.
 
 ## Author
 

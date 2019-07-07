@@ -89,8 +89,9 @@ type
   end;
 
 function IsComment(s:string):boolean;
-function IsName(s:string): boolean;
-function IsString(const s:string): boolean;
+function IsDirective(s:string):boolean;
+function IsName(s:string):boolean;
+function IsString(const s:string):boolean;
 
 implementation
 
